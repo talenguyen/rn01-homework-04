@@ -145,7 +145,6 @@
 				5CC29E315D002BDC60D1FC05 /* Pods-TrucXanh-TrucXanhTests.debug.xcconfig */,
 				961F1179BD73E9F6EEB5682A /* Pods-TrucXanh-TrucXanhTests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
