@@ -8,29 +8,33 @@ import {
 
 import {windowWidth, windowHeight} from './src/utilities/size';
 import Images from './src/assets/images';
+import Desk from './src/components/Desk';
 
-function HookComponent() {
+function ContentView() {
   const insets = useSafeAreaInsets();
-
+  const paddingHorizontal = Math.max(insets.left, insets.right);
+  const paddingVertical = Math.max(insets.top, insets.bottom);
+  const sizeStyle = {paddingHorizontal, paddingVertical};
+  const deskWidth = windowWidth - 2 * paddingHorizontal;
+  const deskHeight = windowHeight - 2 * paddingVertical;
   return (
-    <View
-      style={{
-        paddingBottom: Math.max(insets.bottom, 16),
-        backgroundColor: '#fad',
-      }}
-    />
+    <View style={[styles.content, sizeStyle]}>
+      <Desk width={deskWidth} height={deskHeight} columns={8} />
+    </View>
   );
 }
 
 const App = () => {
   return (
     <View style={styles.container}>
-      <ImageBackground style={styles.background} source={Images.background} />
+      <ImageBackground style={styles.background} source={Images.background}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <ContentView />
+        </SafeAreaProvider>
+      </ImageBackground>
     </View>
   );
 };
-
-export default App;
 
 const styles = StyleSheet.create({
   container: {
@@ -40,17 +44,9 @@ const styles = StyleSheet.create({
     width: windowWidth,
     height: windowHeight,
   },
-  //
-  itemContainer: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    backgroundColor: '#ff000030',
-  },
-  itemText: {
-    fontSize: 20,
+  content: {
+    flex: 1,
   },
 });
+
+export default App;
