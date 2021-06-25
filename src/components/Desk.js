@@ -58,6 +58,7 @@ const onCardPress =
     setLastSelectedCard,
     isAnimating,
     setIsAnimating,
+    onCompleted,
   }) =>
   () => {
     if (isAnimating) {
@@ -103,6 +104,10 @@ const onCardPress =
         });
 
         setCards(newCards);
+        const isCompleted = newCards.every(element => element.isHidden);
+        if (isCompleted) {
+          onCompleted();
+        }
       } else {
         // Select the wrong image
         const newCards = cards.map(element => {
@@ -122,7 +127,7 @@ const onCardPress =
     }, animationTimeout);
   };
 
-const Desk = ({width, height, columns}) => {
+const Desk = ({width, height, columns, onCompleted}) => {
   const [cards, setCards] = useState(composeCards(columns));
   const [lastSelectedCard, setLastSelectedCard] = useState(null);
   const [{cardWidth, cardHeight}] = useState(
@@ -133,7 +138,7 @@ const Desk = ({width, height, columns}) => {
   return (
     <View style={[styles.container]}>
       {cards.map(card => (
-        <View key={card.id} style={{marginTop: verticalSpacing}}>
+        <View key={card.id.toString()} style={{marginTop: verticalSpacing}}>
           <Card
             width={cardWidth}
             height={cardHeight}
@@ -148,6 +153,7 @@ const Desk = ({width, height, columns}) => {
               setLastSelectedCard,
               isAnimating,
               setIsAnimating,
+              onCompleted,
             })}
           />
         </View>
@@ -158,7 +164,6 @@ const Desk = ({width, height, columns}) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'blue',
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',

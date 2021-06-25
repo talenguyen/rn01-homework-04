@@ -1,5 +1,5 @@
-import React from 'react';
-import {StyleSheet, View, Text, ImageBackground} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, View, ImageBackground} from 'react-native';
 import {
   SafeAreaProvider,
   initialWindowMetrics,
@@ -10,21 +10,69 @@ import {windowWidth, windowHeight} from './src/utilities/size';
 import Images from './src/assets/images';
 import Desk from './src/components/Desk';
 import Timer from './src/components/Timer';
+import Menu from './src/components/Menu';
+import {GameState} from './src/utilities/constants';
 
-function ContentView() {
+function menuTitle(state) {
+  if (state === GameState.win) {
+    return 'Win';
+  }
+  if (state === GameState.lose) {
+    return 'Lose';
+  }
+  return 'Welcome';
+}
+
+const menuVisible = state =>
+  state === GameState.menu ||
+  state === GameState.win ||
+  state === GameState.lose;
+
+const ContentView = () => {
+  const [state, setState] = useState(GameState.menu);
+  const [turn, setTurn] = useState(0);
+
+  const onPlayPress = () => {
+    setState(GameState.playing);
+    setTurn(turn + 1);
+  };
+
+  const onTimeOut = () => {
+    setState(GameState.lose);
+  };
+
+  const onCompleted = () => {
+    setState(GameState.win);
+  };
+
   const insets = useSafeAreaInsets();
   const paddingHorizontal = Math.max(insets.left, insets.right);
   const paddingVertical = Math.max(insets.top, insets.bottom);
   const sizeStyle = {paddingHorizontal, paddingBottom: paddingVertical};
   const deskWidth = windowWidth - 2 * paddingHorizontal;
   const deskHeight = windowHeight - 2 * paddingVertical;
+
   return (
     <View style={[styles.content, sizeStyle]}>
-      <Timer duration={5} onTimeOut={() => alert('time out')} />
-      <Desk width={deskWidth} height={deskHeight} columns={8} />
+      <Timer
+        duration={30}
+        isRunning={state === GameState.playing}
+        onTimeOut={onTimeOut}
+      />
+      <Desk
+        width={deskWidth}
+        height={deskHeight}
+        columns={2}
+        onCompleted={onCompleted}
+      />
+      <Menu
+        title={menuTitle(state)}
+        visible={menuVisible(state)}
+        onPlayPress={onPlayPress}
+      />
     </View>
   );
-}
+};
 
 const App = () => {
   return (

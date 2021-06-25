@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {StyleSheet, Text} from 'react-native';
 
 const twoDigitFormat = digit => {
@@ -29,6 +29,10 @@ class Timer extends React.Component {
   };
 
   tick = () => {
+    if (!this.props.isRunning) {
+      return;
+    }
+
     const seconds = this.state.seconds - 1;
     this.setState({seconds});
     if (seconds === 0) {
