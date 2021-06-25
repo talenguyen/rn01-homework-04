@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import Card from './Card';
 import Images from '../assets/images';
@@ -22,11 +22,13 @@ const sourceImages = [
   {id: 10, source: Images.card10},
 ];
 
-function computeCardSize(width, columns, height) {
+function computeCardSize({width, height, columns}) {
+  console.log({width, height, columns});
   const maxCardWidth =
     (width - (columns + 1) * minimumHorizontalSpacing) / columns;
   const cardHeight = (height - (rows + 1) * verticalSpacing) / rows;
   const cardWidth = Math.min(cardSizeRatio * height, maxCardWidth);
+  console.log({cardWidth, cardHeight});
   return {cardWidth, cardHeight};
 }
 
@@ -49,118 +51,122 @@ function composeCards(columns) {
   return cards;
 }
 
-const onCardPress =
-  ({
-    card,
-    cards,
-    setCards,
-    lastSelectedCard,
-    setLastSelectedCard,
-    isAnimating,
-    setIsAnimating,
-    onCompleted,
-  }) =>
-  () => {
-    if (isAnimating) {
-      return;
-    }
+class Desk extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      cards: composeCards(props.columns),
+      lastSelectedCard: null,
+      isAnimating: false,
+    };
+  }
 
-    if (lastSelectedCard && card.id === lastSelectedCard.id) {
-      return; // Select the same card.
-    }
-
-    setIsAnimating(true);
-
-    // show card
-    setCards(
-      cards.map(element => {
-        if (element.id === card.id) {
-          return {
-            ...element,
-            isUp: true,
-          };
-        }
-        return element;
-      }),
-    );
-
-    setTimeout(() => {
-      setIsAnimating(false);
-      if (!lastSelectedCard) {
-        setLastSelectedCard(card);
+  onCardPress(card) {
+    return () => {
+      console.log({state: this.state});
+      if (this.state.isAnimating) {
         return;
       }
 
-      if (card.image.id === lastSelectedCard.image.id) {
-        // Select the same image
-        const newCards = cards.map(element => {
-          if (element.id === card.id || element.id === lastSelectedCard.id) {
-            return {
-              ...element,
-              isHidden: true,
-            };
-          }
-          return element;
-        });
-
-        setCards(newCards);
-        const isCompleted = newCards.every(element => element.isHidden);
-        if (isCompleted) {
-          onCompleted();
-        }
-      } else {
-        // Select the wrong image
-        const newCards = cards.map(element => {
-          if (element.id === card.id || element.id === lastSelectedCard.id) {
-            return {
-              ...element,
-              isUp: false,
-            };
-          }
-          return element;
-        });
-
-        setCards(newCards);
+      if (
+        this.state.lastSelectedCard &&
+        card.id === this.state.lastSelectedCard.id
+      ) {
+        return; // Select the same card.
       }
 
-      setLastSelectedCard(null);
-    }, animationTimeout);
-  };
+      this.setState({
+        isAnimating: true,
+        cards: this.state.cards.map(element => {
+          if (element.id === card.id) {
+            return {
+              ...element,
+              isUp: true,
+            };
+          }
+          return element;
+        }),
+      });
 
-const Desk = ({width, height, columns, onCompleted}) => {
-  const [cards, setCards] = useState(composeCards(columns));
-  const [lastSelectedCard, setLastSelectedCard] = useState(null);
-  const [{cardWidth, cardHeight}] = useState(
-    computeCardSize(width, columns, height),
-  );
-  const [isAnimating, setIsAnimating] = useState(false);
+      this.timeOutId = setTimeout(() => {
+        if (!this.state.lastSelectedCard) {
+          this.setState({
+            isAnimating: false,
+            lastSelectedCard: card,
+          });
+          return;
+        }
 
-  return (
-    <View style={[styles.container]}>
-      {cards.map(card => (
-        <View key={card.id.toString()} style={{marginTop: verticalSpacing}}>
-          <Card
-            width={cardWidth}
-            height={cardHeight}
-            source={card.image.source}
-            isUp={card.isUp}
-            isHidden={card.isHidden}
-            onPress={onCardPress({
-              card,
-              cards,
-              setCards,
-              lastSelectedCard,
-              setLastSelectedCard,
-              isAnimating,
-              setIsAnimating,
-              onCompleted,
-            })}
-          />
-        </View>
-      ))}
-    </View>
-  );
-};
+        let nextState;
+        if (card.image.id === this.state.lastSelectedCard.image.id) {
+          // Select the same image
+          nextState = this.state.cards.map(element => {
+            if (
+              element.id === card.id ||
+              element.id === this.state.lastSelectedCard.id
+            ) {
+              return {
+                ...element,
+                isHidden: true,
+              };
+            }
+            return element;
+          });
+        } else {
+          // Select the wrong image
+          nextState = this.state.cards.map(element => {
+            if (
+              element.id === card.id ||
+              element.id === this.state.lastSelectedCard.id
+            ) {
+              return {
+                ...element,
+                isUp: false,
+              };
+            }
+            return element;
+          });
+        }
+        this.setState({
+          cards: nextState,
+          isAnimating: false,
+          lastSelectedCard: null,
+        });
+        const isCompleted = nextState.every(element => element.isHidden);
+        isCompleted && this.props.onCompleted && this.props.onCompleted(); //trigger callback
+      }, animationTimeout);
+    };
+  }
+
+  componentWillUnmount() {
+    this.timeOutId && clearTimeout(this.timeOutId);
+  }
+
+  render() {
+    const {width, height, columns} = this.props;
+    const {cardWidth, cardHeight} = computeCardSize({width, height, columns});
+    const {cards} = this.state;
+
+    console.log({cardWidth, cardHeight, cards});
+
+    return (
+      <View style={[styles.container]}>
+        {cards.map(card => (
+          <View key={card.id.toString()} style={{marginTop: verticalSpacing}}>
+            <Card
+              width={cardWidth}
+              height={cardHeight}
+              source={card.image.source}
+              isUp={card.isUp}
+              isHidden={card.isHidden}
+              onPress={this.onCardPress(card)}
+            />
+          </View>
+        ))}
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {

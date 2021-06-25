@@ -14,20 +14,19 @@ import Menu from './src/components/Menu';
 import {GameState} from './src/utilities/constants';
 
 const ContentView = () => {
-  const [state, setState] = useState(GameState.menu);
-  const [turn, setTurn] = useState(0);
+  const [gameState, setGameState] = useState(GameState.menu);
 
+  console.log(`state=${gameState}`);
   const onPlayPress = () => {
-    setState(GameState.playing);
-    setTurn(turn + 1);
+    setGameState(GameState.playing);
   };
 
   const onTimeOut = () => {
-    setState(GameState.lose);
+    setGameState(GameState.lose);
   };
 
   const onCompleted = () => {
-    setState(GameState.win);
+    setGameState(GameState.win);
   };
 
   const insets = useSafeAreaInsets();
@@ -37,20 +36,32 @@ const ContentView = () => {
   const deskWidth = windowWidth - 2 * paddingHorizontal;
   const deskHeight = windowHeight - 2 * paddingVertical;
 
+  const gameView = () => {
+    if (gameState === GameState.playing) {
+      return (
+        <View>
+          <Timer
+            duration={30}
+            isRunning={gameState === GameState.playing}
+            onTimeOut={onTimeOut}
+          />
+          <Desk
+            width={deskWidth}
+            height={deskHeight}
+            columns={2}
+            onCompleted={onCompleted}
+          />
+        </View>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <View style={[styles.content, sizeStyle]}>
-      <Timer
-        duration={30}
-        isRunning={state === GameState.playing}
-        onTimeOut={onTimeOut}
-      />
-      <Desk
-        width={deskWidth}
-        height={deskHeight}
-        columns={2}
-        onCompleted={onCompleted}
-      />
-      <Menu state={state} onPlayPress={onPlayPress} />
+      {gameView()}
+      <Menu state={gameState} onPlayPress={onPlayPress} />
     </View>
   );
 };
