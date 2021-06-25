@@ -29,7 +29,6 @@ class Timer extends React.Component {
   };
 
   tick = () => {
-    console.log('tick');
     const seconds = this.state.seconds - 1;
     this.setState({seconds});
     if (seconds === 0) {
