@@ -13,21 +13,6 @@ import Timer from './src/components/Timer';
 import Menu from './src/components/Menu';
 import {GameState} from './src/utilities/constants';
 
-function menuTitle(state) {
-  if (state === GameState.win) {
-    return 'Win';
-  }
-  if (state === GameState.lose) {
-    return 'Lose';
-  }
-  return 'Welcome';
-}
-
-const menuVisible = state =>
-  state === GameState.menu ||
-  state === GameState.win ||
-  state === GameState.lose;
-
 const ContentView = () => {
   const [state, setState] = useState(GameState.menu);
   const [turn, setTurn] = useState(0);
@@ -65,11 +50,7 @@ const ContentView = () => {
         columns={2}
         onCompleted={onCompleted}
       />
-      <Menu
-        title={menuTitle(state)}
-        visible={menuVisible(state)}
-        onPlayPress={onPlayPress}
-      />
+      <Menu state={state} onPlayPress={onPlayPress} />
     </View>
   );
 };

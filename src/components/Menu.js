@@ -1,19 +1,42 @@
 import React from 'react';
 import {StyleSheet, Modal, View, Text, TouchableOpacity} from 'react-native';
+import {GameState} from '../utilities/constants';
 
-function Menu({visible, title, onPlayPress}) {
+function title(state) {
+  if (state === GameState.win) {
+    return 'Win';
+  }
+  if (state === GameState.lose) {
+    return 'Lose';
+  }
+  return 'Welcome';
+}
+
+const visible = state =>
+  state === GameState.menu ||
+  state === GameState.win ||
+  state === GameState.lose;
+
+const buttonText = state => {
+  if (state === GameState.win || state === GameState.lose) {
+    return 'Replay';
+  }
+  return 'Play';
+};
+
+function Menu({state, onPlayPress}) {
   return (
     <Modal
       animationType="fade"
       transparent={true}
-      visible={visible}
+      visible={visible(state)}
       supportedOrientations={['landscape']}
       onRequestClose={() => {}}>
       <View style={styles.menu}>
         <View style={styles.modalView}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title}>{title(state)}</Text>
           <TouchableOpacity onPress={onPlayPress}>
-            <Text style={styles.play}>Play</Text>
+            <Text style={styles.play}>{buttonText(state)}</Text>
           </TouchableOpacity>
         </View>
       </View>
