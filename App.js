@@ -48,7 +48,7 @@ const ContentView = () => {
           <Desk
             width={deskWidth}
             height={deskHeight}
-            columns={2}
+            columns={7}
             onCompleted={onCompleted}
           />
         </View>

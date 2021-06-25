@@ -40,7 +40,7 @@ function composeCards(columns) {
   );
 
   const cards = shuffleArray(
-    Array.from({length: columns * rows}, (_, index) => ({
+    Array.from({length: validHalfCardCount * 2}, (_, index) => ({
       id: index,
       image: images[index % images.length],
       isUp: false,
@@ -172,7 +172,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'center',
     justifyContent: 'space-evenly',
   },
 });
