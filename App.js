@@ -41,7 +41,7 @@ const ContentView = () => {
       return (
         <View>
           <Timer
-            duration={30}
+            duration={300}
             isRunning={gameState === GameState.playing}
             onTimeOut={onTimeOut}
           />
