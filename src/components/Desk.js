@@ -8,7 +8,7 @@ const verticalSpacing = 16;
 const minimumHorizontalSpacing = 8;
 const rows = 3;
 const cardSizeRatio = 0.7;
-const animationTimeout = 300; // milliseconds
+const animationTimeout = 700; // milliseconds
 const sourceImages = [
   {id: 1, source: Images.card1},
   {id: 2, source: Images.card2},
