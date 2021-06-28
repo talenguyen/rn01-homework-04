@@ -63,7 +63,6 @@ class Desk extends React.Component {
 
   onCardPress(card) {
     return () => {
-      console.log({state: this.state});
       if (this.state.isAnimating) {
         return;
       }

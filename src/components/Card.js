@@ -1,17 +1,16 @@
 import React from 'react';
 import {StyleSheet, Image, View, TouchableOpacity} from 'react-native';
 import Images from '../assets/images';
-
-const EmptyCard = ({width, height}) => <View style={{width, height}} />;
+import FadeView, {FadeType} from './FadeView';
 
 const Card = ({source, width, height, isUp, isHidden, onPress}) => {
   const size = {width, height};
-  if (isHidden) {
-    return <EmptyCard width={width} height={height} />;
-  }
+  const fadeType = isHidden ? FadeType.fadeOut : FadeType.fadeIn;
 
   const imageView = isUp ? (
-    <Image style={[styles.image, size]} source={source} />
+    <FadeView type={fadeType}>
+      <Image style={[styles.image, size]} source={source} />
+    </FadeView>
   ) : (
     <Image style={[styles.image, size]} source={Images.cardBack} />
   );
